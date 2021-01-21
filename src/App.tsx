@@ -162,7 +162,7 @@ const App = () => {
         ],
       });
     }
-  }, [colors, currentFeature, importanceData]);
+  }, [colors, currentFeature, importanceData, width]);
 
   // nanStability Chart Data
   useEffect(() => {
