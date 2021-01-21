@@ -2,14 +2,9 @@ import React, { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import importance from './data/feature_importance.json';
 import stability from './data/feature_stability.json';
-import './App.scss';
 import StabilityChart from './components/StabilityChart/StabilityChart';
 import NanStabilityChart from './components/NanStabilityChart/NanStabilityChart';
-import {
-  ChartData,
-  ImportanceData,
-  StabilityData,
-} from './types/types';
+import { ChartData, ImportanceData, StabilityData } from './types/types';
 
 const splitWords = (text: string) => {
   return text.replace(/_/g, ' ');
@@ -19,8 +14,8 @@ const App = () => {
   const [importanceData, setImportanceData] = useState<ImportanceData>();
   const [stabilityData, setStabilityData] = useState<StabilityData>();
   const [mainChartData, setMainChartData] = useState<ChartData>();
-  const [colors, setColors] = useState<string[]>([]);
   const [currentFeature, setCurrentFeature] = useState({ name: '', color: '' });
+  const [colors, setColors] = useState<string[]>([]);
   const [width, setWidth] = useState(1200);
 
   useEffect(() => {
@@ -36,8 +31,6 @@ const App = () => {
     }
   }, []);
 
-  // get the highest stability numbers from feature_stability
-  // set colors accordingly
   useEffect(() => {
     if (importanceData && stabilityData) {
       const stabilityNumber: number[] = [];
@@ -72,7 +65,7 @@ const App = () => {
     }
   }, [importanceData, stabilityData]);
 
-  // Main Chart Data
+  // Chart Settings
   useEffect(() => {
     if (importanceData && colors[0]) {
       setMainChartData({
@@ -80,26 +73,19 @@ const App = () => {
           chart: {
             id: 'importance-bar',
             events: {
-              // @ts-ignore
-              click(event) {
+              click(event: { target: { attributes: { val: { value: number; }; }; }; }) {
                 if (event.target.attributes.val) {
                   setCurrentFeature({
-                    ...currentFeature,
-                    name:
-                      importanceData.names[
-                        importanceData.importance.indexOf(
-                          Number(event.target.attributes.val.value)
-                        )
-                      ],
-                  });
-                  setCurrentFeature({
-                    ...currentFeature,
-                    color:
-                      colors[
-                        importanceData.importance.indexOf(
-                          Number(event.target.attributes.val.value)
-                        )
-                      ],
+                    name: importanceData.names[
+                      importanceData.importance.indexOf(
+                        Number(event.target.attributes.val.value)
+                      )
+                    ],
+                    color: colors[
+                      importanceData.importance.indexOf(
+                        Number(event.target.attributes.val.value)
+                      )
+                    ],
                   });
                 }
               },

@@ -47,11 +47,7 @@ const NanStabilityChart: FC<Props> = ({ stabilityData, currentFeature }) => {
           bar: {
             horizontal: false,
             distributed: false,
-
-            columnWidth: `${
-              100 / // @ts-ignore
-              stabilityData[currentFeature].nanStabilityAnalysis.binWidth
-            }%`,
+            columnWidth: `${100 / stabilityData[currentFeature].nanStabilityAnalysis.binWidth[0]}%`,
           },
         },
         dataLabels: {

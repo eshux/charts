@@ -1,6 +1,7 @@
 import React, { FC, useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
 import { ChartData, StabilityData } from '../../types/types';
+import './StabilityChart.scss';
 
 type Props = {
   stabilityData: StabilityData;
@@ -88,11 +89,8 @@ const StabilityChart: FC<Props> = ({
         plotOptions: {
           bar: {
             horizontal: false,
-            distributed: false,
-            columnWidth: `${
-              100 / // @ts-ignore
-              stabilityData[currentFeature].nanStabilityAnalysis.binWidth
-            }%`,
+            distributed: false, 
+            columnWidth: `${100 / stabilityData[currentFeature].nanStabilityAnalysis.binWidth[0]}%`,
           },
         },
         colors: ['#196D85', '#34B7DC'],
