@@ -338,7 +338,7 @@ const App = () => {
         ],
       });
     }
-  }, [stabilityData, currentFeature, showBar]);
+  }, [stabilityData, currentFeature, showBar, width]);
 
   if (!importanceData && !stabilityData) {
     return <h1>loading...</h1>;
