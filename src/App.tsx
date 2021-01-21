@@ -20,10 +20,20 @@ const App = () => {
   const [currentFeature, setCurrentFeature] = useState('');
   const [currentFeatureColor, setCurrentFeatureColor] = useState('');
   const [showBar, setShowBar] = useState(false);
+  const [width, setWidth] = useState(1200);
+
 
   useEffect(() => {
     setImportanceData(importance.data.featureImportance.metrics);
     setStabilityData(stability.data.productionModelMetrics.parameterStability);
+
+    if (window.innerWidth <= 500) {
+      setWidth(500);
+    } else if (window.innerWidth <= 660) {
+      setWidth(660);
+    } else if (window.innerWidth <= 1023) {
+      setWidth(1023);
+    } 
   }, []);
 
   // get the highest stability numbers from feature_stability
@@ -109,11 +119,12 @@ const App = () => {
           },
           responsive: [
             {
-              breakpoint: 1024,
+              breakpoint: width,
               options: {
                 yaxis: {
                   labels: {
-                    maxWidth: 400,
+                    show: (width > 500),
+                    maxWidth: width/2,
                     style: {
                       fontSize: '8',
                     },

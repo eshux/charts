@@ -65,6 +65,7 @@ export type ChartData = {
         };
         yaxis?: {
           labels?: {
+            show: boolean;
             maxWidth?: number;
             style?: {
               fontSize?: string | number;
