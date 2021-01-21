@@ -2,7 +2,7 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-[Click here](https://eshux.github.io/charts/), to see the project
+[Click here](https://eshux.github.io/charts/) to see the project
 
 ## To run the app
 
