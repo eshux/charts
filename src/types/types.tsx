@@ -65,11 +65,13 @@ export type ChartData = {
         };
         yaxis?: {
           labels?: {
-            show: boolean;
+            show?: boolean;
             maxWidth?: number;
+            align?: string,
             style?: {
               fontSize?: string | number;
             };
+            formatter?: (val: string) => string;
           };
         };
         plotOptions?: {

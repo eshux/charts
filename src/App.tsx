@@ -285,6 +285,21 @@ const App = () => {
               },
             },
           },
+          responsive: [
+            {
+              breakpoint: width,
+              options: {
+                yaxis: {
+                  labels: {
+                    show: (width > 500),
+                    style: {
+                      fontSize: '9',
+                    },
+                  },
+                },
+              },
+            },
+          ],
           dataLabels: {
             enabled: false,
           },
