@@ -3,7 +3,9 @@ export type ChartData = {
     chart: {
       id: string;
       type?: string;
-      events?: {click(event: Object): void};
+      events?: {click(event: {
+        target: { attributes: { val: { value: number } } };
+      }): void};
       toolbar?: {
         show?: boolean;
         tools?: {

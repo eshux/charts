@@ -1,6 +1,7 @@
 import React, { FC, useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
 import { ChartData, ImportanceData } from '../../types/types';
+import { setMainChartConfig } from '../../chartConfigs/mainChartConfig';
 
 type Props = {
   importanceData: ImportanceData;
@@ -20,74 +21,18 @@ const NanStabilityChart: FC<Props> = ({
   const [mainChartData, setMainChartData] = useState<ChartData>();
 
   useEffect(() => {
-    if (importanceData && colors[0]) {
-      setMainChartData({
-        options: {
-          chart: {
-            id: 'importance-bar',
-            events: { click },
-          },
-          xaxis: {
-            categories: [...importanceData.names],
-            labels: {
-              show: true,
-            },
-          },
-          yaxis: {
-            labels: {
-              show: true,
-              align: 'right',
-              trim: false,
-              maxWidth: 800,
-              minWidth: 0,
-            },
-          },
-          responsive: [
-            {
-              breakpoint: width,
-              options: {
-                yaxis: {
-                  labels: {
-                    show: width > 500,
-                    maxWidth: width / 2,
-                    style: {
-                      fontSize: '8',
-                    },
-                  },
-                },
-                xaxis: {
-                  labels: {
-                    style: {
-                      fontSize: '8',
-                    },
-                  },
-                },
-              },
-            },
-          ],
-          plotOptions: {
-            bar: {
-              horizontal: true,
-              distributed: true,
-            },
-          },
-          dataLabels: {
-            enabled: false,
-          },
-          legend: {
-            show: false,
-          },
-          colors: [...colors],
-        },
-        series: [
-          {
-            name: 'Importance',
-            data: [...importanceData.importance],
-          },
-        ],
-      });
-    }
-  }, [colors, importanceData, width]);
+    const newConfig = setMainChartConfig(
+      click,
+      width > 500,
+      colors,
+      importanceData.names,
+      width,
+      width / 2,
+      importanceData.importance,
+    );
+
+    setMainChartData(newConfig);
+  }, [width]);
 
   return (
     <>

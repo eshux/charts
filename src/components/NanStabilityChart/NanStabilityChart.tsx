@@ -1,6 +1,7 @@
 import React, { FC, useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
 import { ChartData, StabilityData } from '../../types/types';
+import { setFeatureChartConfig } from '../../chartConfigs/featureChartConfig';
 
 type Props = {
   stabilityData: StabilityData;
@@ -10,69 +11,24 @@ type Props = {
 const NanStabilityChart: FC<Props> = ({ stabilityData, currentFeature }) => {
   const [nanStabChartData, setNanStabChartData] = useState<ChartData>();
 
+  const dataPath = stabilityData[currentFeature].nanStabilityAnalysis;
+  const categories = dataPath.xLeftEdge;
+  const data1 = dataPath.yBaseline;
+  const data2 = dataPath.yProduction;
+
   useEffect(() => {
-    setNanStabChartData({
-      options: {
-        chart: {
-          id: 'nanStability-bar',
-        },
-        xaxis: {
-          categories: [
-            ...stabilityData[currentFeature].nanStabilityAnalysis.xLeftEdge,
-          ],
-          labels: {
-            show: true,
-            trim: false,
-            formatter(val: string) {
-              return Number(val).toFixed(3);
-            },
-          },
-        },
-        yaxis: {
-          labels: {
-            show: true,
-            align: 'right',
-            minWidth: 100,
-            maxWidth: 400,
-            style: {
-              fontSize: '10',
-            },
-          },
-        },
-        title: {
-          text: 'NanStability data',
-          margin: 20,
-        },
-        plotOptions: {
-          bar: {
-            horizontal: false,
-            distributed: false,
-            columnWidth: `${100 / stabilityData[currentFeature].nanStabilityAnalysis.binWidth[0]}%`,
-          },
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        legend: {
-          show: false,
-        },
-        colors: ['#196D85', '#34B7DC'],
-      },
-      series: [
-        {
-          name: 'Baseline',
-          data: [
-            ...stabilityData[currentFeature].nanStabilityAnalysis.yBaseline,
-          ],
-        },
-        {
-          name: 'Production',
-          data: [
-            ...stabilityData[currentFeature].nanStabilityAnalysis.yProduction,
-          ],
-        },
-      ],
-    });
+    const newConfig = setFeatureChartConfig(
+      'nanStability-bar',
+      'NanStability data',
+      true,
+      '10',
+      categories,
+      0,
+      data1,
+      data2
+    );
+
+    setNanStabChartData(newConfig);
   }, [stabilityData, currentFeature]);
 
   return (

@@ -10,17 +10,50 @@ const splitWords = (text: string) => {
   return text.replace(/_/g, ' ');
 };
 
+const importanceData: ImportanceData = importance.data.featureImportance.metrics;
+const stabilityData: StabilityData = stability.data.productionModelMetrics.parameterStability;
+
+const getHighestNum = () => {
+  const stabilityNumber: number[] = [];
+  
+  importanceData.names.forEach((item) => {
+    const nanStab = stabilityData[item].nanStabilityAnalysis.stabilityGroup[0];
+    const stab = stabilityData[item].stabilityAnalysis.stabilityGroup[0];
+
+    if (nanStab > stab) {
+      stabilityNumber.push(nanStab);
+    } else {
+      stabilityNumber.push(stab);
+    }
+  });
+  return stabilityNumber;
+};
+
+const setColors = () => {
+  const num = getHighestNum();
+  const colorArr: string[] = [];
+
+  num.forEach((item) => {
+    switch (item) {
+      case 1:
+        colorArr.push('#73C200');
+        break;
+      case 2:
+        colorArr.push('#F09C00');
+        break;
+      default:
+        colorArr.push('#D63700');
+        break;
+    }
+  });
+  return colorArr;
+};
+
 const App = () => {
-  const [importanceData, setImportanceData] = useState<ImportanceData>();
-  const [stabilityData, setStabilityData] = useState<StabilityData>();
   const [currentFeature, setCurrentFeature] = useState({ name: '', color: '' });
-  const [colors, setColors] = useState<string[]>([]);
   const [width, setWidth] = useState(1200);
 
   useEffect(() => {
-    setImportanceData(importance.data.featureImportance.metrics);
-    setStabilityData(stability.data.productionModelMetrics.parameterStability);
-
     if (window.innerWidth <= 500) {
       setWidth(500);
     } else if (window.innerWidth <= 660) {
@@ -30,64 +63,21 @@ const App = () => {
     }
   }, []);
 
-  // Getting highest stability number and setting colors accordingly
-  useEffect(() => {
-    if (importanceData && stabilityData) {
-      const stabilityNumber: number[] = [];
-      const colorArr: string[] = [];
-
-      importanceData.names.forEach((item) => {
-        const nanStab =
-          stabilityData[item].nanStabilityAnalysis.stabilityGroup[0];
-        const stab = stabilityData[item].stabilityAnalysis.stabilityGroup[0];
-
-        if (nanStab > stab) {
-          stabilityNumber.push(nanStab);
-        } else {
-          stabilityNumber.push(stab);
-        }
-      });
-
-      stabilityNumber.forEach((item) => {
-        switch (item) {
-          case 1:
-            colorArr.push('#73C200');
-            break;
-          case 2:
-            colorArr.push('#F09C00');
-            break;
-          default:
-            colorArr.push('#D63700');
-            break;
-        }
-      });
-
-      setColors(colorArr);
-    }
-  }, [importanceData, stabilityData]);
-
   // Selecting a feature
   const click = (event: {
     target: { attributes: { val: { value: number } } };
   }) => {
-    if (importanceData) {
-      if (event.target.attributes.val) {
-        setCurrentFeature({
-          name:
-            importanceData.names[
-              importanceData.importance.indexOf(
-                Number(event.target.attributes.val.value)
-              )
-            ],
-          color:
-            colors[
-              importanceData.importance.indexOf(
-                Number(event.target.attributes.val.value)
-              )
-            ],
-        });
-      }
+    if (!importanceData && !event.target.attributes.val) {
+      return;
     }
+    const featureIndex = importanceData.importance.indexOf(
+      Number(event.target.attributes.val.value)
+    );
+
+    setCurrentFeature({
+      name: importanceData.names[featureIndex],
+      color: setColors()[featureIndex],
+    });
   };
 
   if (!importanceData && !stabilityData) {
@@ -99,14 +89,12 @@ const App = () => {
       <div className="container container-fluid">
         <div className="row">
           <div className="col-xs-12">
-            {importanceData && (
-              <MainChart
-                click={click}
-                width={width}
-                colors={colors}
-                importanceData={importanceData}
-              />
-            )}
+            <MainChart
+              click={click}
+              width={width}
+              colors={setColors()}
+              importanceData={importanceData}
+            />
           </div>
         </div>
         {currentFeature.name && (
@@ -119,23 +107,21 @@ const App = () => {
                 </h4>
               </div>
             </div>
-            {stabilityData && (
-              <div className="row">
-                <div className="col-xs-12">
-                  <StabilityChart
-                    stabilityData={stabilityData}
-                    width={width}
-                    currentFeature={currentFeature.name}
-                  />
-                </div>
-                <div className="col-md-6 col-xs-12">
-                  <NanStabilityChart
-                    stabilityData={stabilityData}
-                    currentFeature={currentFeature.name}
-                  />
-                </div>
+            <div className="row">
+              <div className="col-xs-12">
+                <StabilityChart
+                  stabilityData={stabilityData}
+                  width={width}
+                  currentFeature={currentFeature.name}
+                />
               </div>
-            )}
+              <div className="col-md-6 col-xs-12">
+                <NanStabilityChart
+                  stabilityData={stabilityData}
+                  currentFeature={currentFeature.name}
+                />
+              </div>
+            </div>
           </>
         )}
       </div>
