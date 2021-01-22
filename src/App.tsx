@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import Chart from 'react-apexcharts';
 import importance from './data/feature_importance.json';
 import stability from './data/feature_stability.json';
 import StabilityChart from './components/StabilityChart/StabilityChart';
 import NanStabilityChart from './components/NanStabilityChart/NanStabilityChart';
-import { ChartData, ImportanceData, StabilityData } from './types/types';
+import MainChart from './components/MainChart/MainChart';
+import { ImportanceData, StabilityData } from './types/types';
 
 const splitWords = (text: string) => {
   return text.replace(/_/g, ' ');
@@ -13,7 +13,6 @@ const splitWords = (text: string) => {
 const App = () => {
   const [importanceData, setImportanceData] = useState<ImportanceData>();
   const [stabilityData, setStabilityData] = useState<StabilityData>();
-  const [mainChartData, setMainChartData] = useState<ChartData>();
   const [currentFeature, setCurrentFeature] = useState({ name: '', color: '' });
   const [colors, setColors] = useState<string[]>([]);
   const [width, setWidth] = useState(1200);
@@ -31,13 +30,15 @@ const App = () => {
     }
   }, []);
 
+  // Getting highest stability number and setting colors accordingly
   useEffect(() => {
     if (importanceData && stabilityData) {
       const stabilityNumber: number[] = [];
       const colorArr: string[] = [];
 
       importanceData.names.forEach((item) => {
-        const nanStab = stabilityData[item].nanStabilityAnalysis.stabilityGroup[0];
+        const nanStab =
+          stabilityData[item].nanStabilityAnalysis.stabilityGroup[0];
         const stab = stabilityData[item].stabilityAnalysis.stabilityGroup[0];
 
         if (nanStab > stab) {
@@ -65,93 +66,29 @@ const App = () => {
     }
   }, [importanceData, stabilityData]);
 
-  // Chart Settings
-  useEffect(() => {
-    if (importanceData && colors[0]) {
-      setMainChartData({
-        options: {
-          chart: {
-            id: 'importance-bar',
-            events: {
-              click(event: { target: { attributes: { val: { value: number; }; }; }; }) {
-                if (event.target.attributes.val) {
-                  setCurrentFeature({
-                    name: importanceData.names[
-                      importanceData.importance.indexOf(
-                        Number(event.target.attributes.val.value)
-                      )
-                    ],
-                    color: colors[
-                      importanceData.importance.indexOf(
-                        Number(event.target.attributes.val.value)
-                      )
-                    ],
-                  });
-                }
-              },
-            },
-          },
-          xaxis: {
-            categories: [...importanceData.names],
-            labels: {
-              show: true,
-            },
-          },
-          yaxis: {
-            labels: {
-              show: true,
-              align: 'right',
-              trim: false,
-              maxWidth: 800,
-              minWidth: 0,
-            },
-          },
-          responsive: [
-            {
-              breakpoint: width,
-              options: {
-                yaxis: {
-                  labels: {
-                    show: width > 500,
-                    maxWidth: width / 2,
-                    style: {
-                      fontSize: '8',
-                    },
-                  },
-                },
-                xaxis: {
-                  labels: {
-                    style: {
-                      fontSize: '8',
-                    },
-                  },
-                },
-              },
-            },
-          ],
-          plotOptions: {
-            bar: {
-              horizontal: true,
-              distributed: true,
-            },
-          },
-          dataLabels: {
-            enabled: false,
-          },
-          legend: {
-            show: false,
-          },
-          colors: [...colors],
-        },
-        series: [
-          {
-            name: 'Importance',
-            data: [...importanceData.importance],
-          },
-        ],
-      });
+  // Selecting a feature
+  const click = (event: {
+    target: { attributes: { val: { value: number } } };
+  }) => {
+    if (importanceData) {
+      if (event.target.attributes.val) {
+        setCurrentFeature({
+          name:
+            importanceData.names[
+              importanceData.importance.indexOf(
+                Number(event.target.attributes.val.value)
+              )
+            ],
+          color:
+            colors[
+              importanceData.importance.indexOf(
+                Number(event.target.attributes.val.value)
+              )
+            ],
+        });
+      }
     }
-  }, [colors, currentFeature, importanceData, width]);
+  };
 
   if (!importanceData && !stabilityData) {
     return <h1>loading...</h1>;
@@ -162,11 +99,12 @@ const App = () => {
       <div className="container container-fluid">
         <div className="row">
           <div className="col-xs-12">
-            {mainChartData && (
-              <Chart
-                options={mainChartData.options}
-                series={mainChartData.series}
-                type="bar"
+            {importanceData && (
+              <MainChart
+                click={click}
+                width={width}
+                colors={colors}
+                importanceData={importanceData}
               />
             )}
           </div>
