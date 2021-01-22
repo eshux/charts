@@ -14,7 +14,7 @@ const NanStabilityChart: FC<Props> = ({ stabilityData, currentFeature }) => {
     setNanStabChartData({
       options: {
         chart: {
-          id: 'anStability-bar',
+          id: 'nanStability-bar',
         },
         xaxis: {
           categories: [
