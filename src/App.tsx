@@ -67,7 +67,7 @@ const App = () => {
   const click = (event: {
     target: { attributes: { val: { value: number } } };
   }) => {
-    if (!importanceData && !event.target.attributes.val) {
+    if (!importanceData || !event.target.attributes.val) {
       return;
     }
     const featureIndex = importanceData.importance.indexOf(
